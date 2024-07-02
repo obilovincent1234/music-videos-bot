@@ -10,7 +10,7 @@ from movies_scraper import search_movies, get_movie
 
 # Telegram bot token
 TOKEN = os.getenv("TOKEN")
-URL = "https://musicstudio.com.ng/"  # Replace with your website URL
+URL = os.getenv("URL")  # Use environment variable for the URL
 bot = Bot(TOKEN)
 
 # Flask app initialization
@@ -42,13 +42,11 @@ def movie_result(update, context):
     movie_id = query.data
     movie_data = get_movie(movie_id)
 
-    response = requests.get(movie_data["img"])
+    response = requests.get(movie_data["image_url"])
     img = BytesIO(response.content)
     query.message.reply_photo(photo=img, caption=f"🎥 {movie_data['title']}")
 
-    links = movie_data["links"]
-    caption = "\n".join([f"🎬 {title}\n{link}" for title, link in links.items()])
-    query.message.reply_text(caption)
+    query.message.reply_text(f"Download Link: {movie_data['video_url']}")
 
 # Set up dispatcher and handlers
 def setup():
