@@ -2,8 +2,8 @@ import requests
 from bs4 import BeautifulSoup
 
 
-url_list = {"https://music-videos-bot.vercel.app/"}
-api_key = "7169206972:AAH63VvK3RIBOuZujwakdys0wpZSQOoTD_o"
+url_list = {}
+api_key = "e59cb11de157619aee585ddb38129d860ea455a6"
 
 
 def search_movies(query):
