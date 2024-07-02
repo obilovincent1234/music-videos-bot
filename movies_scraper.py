@@ -1,39 +1,38 @@
 # movies_scraper.py
 
-import requests
-from bs4 import BeautifulSoup
+import mysql.connector
+import os
 
-# Function to search for movies
+# Database connection configuration using environment variables
+db_config = {
+    'user': os.getenv('DB_USER'),
+    'password': os.getenv('DB_PASSWORD'),
+    'host': os.getenv('DB_HOST'),
+    'database': os.getenv('DB_NAME'),
+}
+
 def search_movies(query):
-    movies_list = []
-    url = f"https://musicstudio.com.ng/search?q={query}"
-    response = requests.get(url)
-    if response.status_code == 200:
-        soup = BeautifulSoup(response.content, 'html.parser')
-        results = soup.find_all('div', class_='movie-item')
-
-        for result in results:
-            title = result.find('h2', class_='title').text.strip()
-            link = result.find('a')['href']
-            movies_list.append({"title": title, "link": link})
-
+    connection = mysql.connector.connect(**db_config)
+    cursor = connection.cursor(dictionary=True)
+    
+    search_query = "SELECT id, title FROM movies WHERE title LIKE %s"
+    cursor.execute(search_query, (f"%{query}%",))
+    movies_list = cursor.fetchall()
+    
+    cursor.close()
+    connection.close()
+    
     return movies_list
 
-# Function to get movie details
 def get_movie(movie_id):
-    movie_details = {}
-    url = f"https://musicstudio.com.ng/movie/{movie_id}"
-    response = requests.get(url)
-    if response.status_code == 200:
-        soup = BeautifulSoup(response.content, 'html.parser')
-        title = soup.find('h1', class_='movie-title').text.strip()
-        img_url = soup.find('img', class_='movie-img')['src']
-        download_links = soup.find('div', class_='download-links').find_all('a')
-
-        links = {}
-        for link in download_links:
-            links[link.text.strip()] = link['href']
-
-        movie_details = {"title": title, "img": img_url, "links": links}
-
+    connection = mysql.connector.connect(**db_config)
+    cursor = connection.cursor(dictionary=True)
+    
+    movie_query = "SELECT title, image_url, video_url FROM movies WHERE id = %s"
+    cursor.execute(movie_query, (movie_id,))
+    movie_details = cursor.fetchone()
+    
+    cursor.close()
+    connection.close()
+    
     return movie_details
