@@ -1,41 +1,46 @@
-import requests
-from bs4 import BeautifulSoup
+# movies_scraper.py
 
+import mysql.connector
+import os
+import subprocess
 
-url_list = {}
-api_key = "e59cb11de157619aee585ddb38129d860ea455a6"
+# Function to start VPN connection
+def start_vpn():
+    vpn_script = '/path/to/vpn_connect.sh'
+    subprocess.run(['sudo', vpn_script])
 
+# Database connection configuration using environment variables
+db_config = {
+    'user': os.getenv('DB_USER'),
+    'password': os.getenv('DB_PASSWORD'),
+    'host': os.getenv('DB_HOST'),
+    'database': os.getenv('DB_NAME'),
+}
 
 def search_movies(query):
-    movies_list = []
-    movies_details = {}
-    website = BeautifulSoup(requests.get(f"https://185.53.88.104/?s={query.replace(' ', '+')}").text, "html.parser")
-    movies = website.find_all("a", {'class': 'ml-mask jt'})
-    for movie in movies:
-        if movie:
-            movies_details["id"] = f"link{movies.index(movie)}"
-            movies_details["title"] = movie.find("span", {'class': 'mli-info'}).text
-            url_list[movies_details["id"]] = movie['href']
-        movies_list.append(movies_details)
-        movies_details = {}
+    start_vpn()  # Start the VPN connection
+    connection = mysql.connector.connect(**db_config)
+    cursor = connection.cursor(dictionary=True)
+    
+    search_query = "SELECT id, title FROM movies WHERE title LIKE %s"
+    cursor.execute(search_query, (f"%{query}%",))
+    movies_list = cursor.fetchall()
+    
+    cursor.close()
+    connection.close()
+    
     return movies_list
 
-
-def get_movie(query):
-    movie_details = {}
-    movie_page_link = BeautifulSoup(requests.get(f"{url_list[query]}").text, "html.parser")
-    if movie_page_link:
-        title = movie_page_link.find("div", {'class': 'mvic-desc'}).h3.text
-        movie_details["title"] = title
-        img = movie_page_link.find("div", {'class': 'mvic-thumb'})['data-bg']
-        movie_details["img"] = img
-        links = movie_page_link.find_all("a", {'rel': 'noopener', 'data-wpel-link': 'internal'})
-        final_links = {}
-        for i in links:
-            url = f"https://urlshortx.com/api?api={api_key}&url={i['href']}"
-            response = requests.get(url)
-            link = response.json()
-            final_links[f"{i.text}"] = link['shortenedUrl']
-        movie_details["links"] = final_links
+def get_movie(movie_id):
+    start_vpn()  # Start the VPN connection
+    connection = mysql.connector.connect(**db_config)
+    cursor = connection.cursor(dictionary=True)
+    
+    movie_query = "SELECT title, image_url, video_url FROM movies WHERE id = %s"
+    cursor.execute(movie_query, (movie_id,))
+    movie_details = cursor.fetchone()
+    
+    cursor.close()
+    connection.close()
+    
     return movie_details
-
