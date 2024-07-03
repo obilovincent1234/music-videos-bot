@@ -1,5 +1,3 @@
-# index.py
-
 import os
 from io import BytesIO
 from queue import Queue
@@ -7,7 +5,7 @@ import requests
 from flask import Flask, request
 from telegram import Bot, Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CommandHandler, MessageHandler, Filters, CallbackQueryHandler, Dispatcher
-from movies_scraper import search_movies, get_movie
+from movies_scraper import search_movies, get_movie  # Assuming these are your custom functions
 
 TOKEN = os.getenv("TOKEN")
 URL = "https://music-videos-bot.vercel.app"  # Ensure this is your correct URL
@@ -70,9 +68,9 @@ def respond():
 def set_webhook():
     s = bot.setWebhook(f'{URL}/{TOKEN}')
     if s:
-        return "webhook setup ok"
+        return "Webhook setup OK"
     else:
-        return "webhook setup failed"
+        return "Webhook setup failed"
 
 if __name__ == "__main__":
     app.run(threaded=True)
