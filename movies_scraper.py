@@ -2,12 +2,6 @@
 
 import mysql.connector
 import os
-import subprocess
-
-# Function to start VPN connection
-def start_vpn():
-    vpn_script = '/path/to/vpn_connect.sh'
-    subprocess.run(['sudo', vpn_script])
 
 # Database connection configuration using environment variables
 db_config = {
@@ -18,7 +12,6 @@ db_config = {
 }
 
 def search_movies(query):
-    start_vpn()  # Start the VPN connection
     connection = mysql.connector.connect(**db_config)
     cursor = connection.cursor(dictionary=True)
     
@@ -32,7 +25,6 @@ def search_movies(query):
     return movies_list
 
 def get_movie(movie_id):
-    start_vpn()  # Start the VPN connection
     connection = mysql.connector.connect(**db_config)
     cursor = connection.cursor(dictionary=True)
     
