@@ -1,0 +1,85 @@
+{
+	"name": "node-raspar",
+	"version": "1.2.6",
+	"description": "Easily scrap the web for torrent and media files.",
+	"main": "index.js",
+	"scripts": {
+		"start": "node . api",
+		"dev": "nodemon --trace-warnings . api",
+		"test": "jest --verbose",
+		"test:watch": "jest --verbose --watchAll"
+	},
+	"engines": {
+		"node": ">=14.x <17.x"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/kodjunkie/node-raspar.git"
+	},
+	"keywords": [
+		"music",
+		"api",
+		"download",
+		"search",
+		"torrent",
+		"mp3",
+		"mp4",
+		"video",
+		"scraping",
+		"crawling",
+		"spider",
+		"free",
+		"nodejs",
+		"lossless",
+		"EDM",
+		"instrumentals",
+		"beats",
+		"node"
+	],
+	"author": "Lawrence Onah <paplow01@gmail.com>",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/kodjunkie/node-raspar/issues"
+	},
+	"homepage": "https://github.com/kodjunkie/node-raspar#readme",
+	"dependencies": {
+		"cache-manager": "^3.6.1",
+		"cache-manager-fs-hash": "0.0.9",
+		"commander": "^2.20.3",
+		"express": "^4.17.3",
+		"express-validator": "^6.14.0",
+		"jquery": "^3.6.0",
+		"puppeteer": "^13.6.0",
+		"puppeteer-extra": "^3.2.3",
+		"puppeteer-extra-plugin-adblocker": "^2.12.0",
+		"puppeteer-extra-plugin-anonymize-ua": "^2.3.3",
+		"puppeteer-extra-plugin-stealth": "^2.9.0",
+		"swagger-jsdoc": "^6.2.0",
+		"swagger-ui-express": "^4.3.0"
+	},
+	"devDependencies": {
+		"@types/jest": "^26.0.24",
+		"eslint": "^7.32.0",
+		"eslint-config-prettier": "^8.5.0",
+		"eslint-plugin-node": "^11.1.0",
+		"eslint-plugin-prettier": "^3.4.1",
+		"jest": "^27.5.1",
+		"nodemon": "^2.0.16",
+		"prettier": "^2.6.2"
+	},
+	"bin": "./index.js",
+	"jest": {
+		"testEnvironment": "node",
+		"setupFilesAfterEnv": [
+			"./setup-tests.js"
+		]
+	},
+	"nodemonConfig": {
+		"ignore": [
+			"__tests__/*",
+			"node_modules/*",
+			"docker/*",
+			"temp/*"
+		]
+	}
+}
