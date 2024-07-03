@@ -71,7 +71,7 @@ def webhook():
 # Set webhook route
 @app.route('/setwebhook', methods=['GET', 'POST'])
 def set_webhook():
-    s = bot.set_webhook('{URL}/{HOOK}'.format(URL=URL, HOOK=TOKEN))
+    s = bot.set_webhook('{}/{}'.format(URL, TOKEN))
     if s:
         return "Webhook setup successful!"
     else:
