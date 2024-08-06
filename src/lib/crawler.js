@@ -6,6 +6,7 @@ xvfb.startSync();
 const puppeteer = require("puppeteer-extra");
 const Cache = require("./cache");
 const { readFileSync } = require("fs");
+const ZippyShare = require('./drivers/zippyshare');
 const referrers = require("../config/referrers.json");
 const { cache: cacheConfig, perPage } = require("../config");
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
@@ -23,6 +24,10 @@ const transform = () => {
     // Replace 'selector' with your specific selector to match the elements you want to scrape
     return Array.from(document.querySelectorAll('selector')).map(el => el.innerText);
 };
+const drivers = {
+    zippyshare: ZippyShare,
+    // Add other drivers here
+};
 
 module.exports = class Crawler {
     constructor(options) {
@@ -31,6 +36,16 @@ module.exports = class Crawler {
         this.cache = new Cache(cacheConfig, cacheOptions);
         this.isLaunched = false;
         this.perPage = options && options.perPage ? options.perPage : perPage;
+        this.drivers = drivers;
+
+         async scrape(driverName, url, transform) {
+        const Driver = this.drivers[driverName];
+        if (!Driver) {
+            throw new Error(`Driver not found: ${driverName}`);
+        }
+        const driverInstance = new Driver();
+        return await driverInstance.scrape(url, transform);
+    }
 
         return new Proxy(this, {
             get: function (driver, property) {
