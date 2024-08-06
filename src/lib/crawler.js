@@ -79,7 +79,7 @@ module.exports = class Crawler {
 			// Launch the browser
 			await this.launchBrowser();
 			const page = await this.browser.newPage();
-			await page.setCacheEnabled(true);
+			await page.setCacheEnabled(false);
 			await page.setExtraHTTPHeaders({ referer });
 			await page._client.send("Network.clearBrowserCookies");
 			await page.evaluateOnNewDocument(preloadFile);
