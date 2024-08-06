@@ -49,29 +49,23 @@ module.exports = class Crawler {
      * Initialize the browser
      * Ensure only a browser is running
      */
-    async launchBrowser() {
-        if (!this.isLaunched) {
-            this.browser = await puppeteer.launch({
-                args: [
-                    "--disable-gpu",
-                    "--no-sandbox",
-                    "--disable-dev-shm-usage",
-                    "--disable-setuid-sandbox",
-                    "--disable-infobars",
-                    "--window-position=0,0",
-                    "--ignore-certifcate-errors",
-                    "--ignore-certifcate-errors-spki-list",
-                    "--disable-features=IsolateOrigins,site-per-process",
-                    "--blink-settings=imagesEnabled=true",
-                ],
-                headless: true, // Set to true for production use
-                ignoreHTTPSErrors: true,
-                slowMo: 0,
-            });
-
-            this.isLaunched = true;
-        }
+   async launchBrowser() {
+    if (!this.isLaunched) {
+        this.browser = await puppeteer.launch({
+            args: [
+                "--no-sandbox",
+                "--disable-dev-shm-usage",
+                "--disable-setuid-sandbox",
+                // Other args as needed
+            ],
+            headless: true, // Set to true for headless operation
+            ignoreHTTPSErrors: true,
+            slowMo: 0,
+        });
+        this.isLaunched = true;
     }
+}
+
 
     /**
      * Web crawler
