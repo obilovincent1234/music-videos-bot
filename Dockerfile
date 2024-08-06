@@ -15,17 +15,23 @@ ENV CHROME_BIN=/usr/bin/google-chrome \
     PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
     PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome
 
-# Create app directory
-WORKDIR /app
+# Install global dependencies
+RUN npm install -g pm2 nodemon
+
+# App setup
+WORKDIR /home/src/raspar
+
+COPY ./ ./
 
 # Install app dependencies
-COPY package.json ./
 RUN npm install
 
-# Bundle app source
-COPY . .
+# Setup cache directory
+RUN mkdir -p temp \
+    && chmod -R 777 temp/
 
-# Run as non-privileged user
+EXPOSE 3000
+
 USER node
 
-CMD ["npm", "start"]
+CMD [ "pm2-runtime", "npm", "--", "start" ]
