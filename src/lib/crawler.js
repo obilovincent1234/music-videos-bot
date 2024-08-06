@@ -1,6 +1,11 @@
+const Xvfb = require('xvfb');
+const xvfb = new Xvfb();
+
+xvfb.startSync();
+
+const puppeteer = require("puppeteer-extra");
 const Cache = require("./cache");
 const { readFileSync } = require("fs");
-const puppeteer = require("puppeteer-extra");
 const referrers = require("../config/referrers.json");
 const { cache: cacheConfig, perPage } = require("../config");
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
@@ -21,23 +26,15 @@ const transform = () => {
 
 module.exports = class Crawler {
     constructor(options) {
-        // Configure cache
         let cacheOptions;
         if (options) cacheOptions = options.cache;
         this.cache = new Cache(cacheConfig, cacheOptions);
-
-        // Browser launch check
         this.isLaunched = false;
-
-        // Results per page
         this.perPage = options && options.perPage ? options.perPage : perPage;
 
-        // Throw error for methods not found
         return new Proxy(this, {
             get: function (driver, property) {
-                // If method exists
                 if (property in driver) return driver[property];
-                // Else
                 return function () {
                     throw new Error("No implementation found!");
                 };
@@ -45,42 +42,29 @@ module.exports = class Crawler {
         });
     }
 
-    /*
-     * Initialize the browser
-     * Ensure only a browser is running
-     */
-  async launchBrowser() {
-    if (!this.isLaunched) {
-        this.browser = await puppeteer.launch({
-            args: [
-                "--no-sandbox",
-                "--disable-setuid-sandbox",
-                "--disable-dev-shm-usage",
-                "--disable-gpu",
-                "--single-process",
-                "--no-zygote",
-                "--window-size=1920,1080" // Optional: Define window size
-            ],
-            headless: true, // Set to true for headless operation
-            ignoreHTTPSErrors: true,
-            slowMo: 0,
-        });
-        this.isLaunched = true;
+    async launchBrowser() {
+        if (!this.isLaunched) {
+            this.browser = await puppeteer.launch({
+                args: [
+                    "--no-sandbox",
+                    "--disable-setuid-sandbox",
+                    "--disable-dev-shm-usage",
+                    "--disable-gpu",
+                    "--single-process",
+                    "--no-zygote",
+                    "--window-size=1920,1080"
+                ],
+                headless: true,
+                ignoreHTTPSErrors: true,
+                slowMo: 0,
+            });
+            this.isLaunched = true;
+        }
     }
-}
 
-
-
-    /**
-     * Web crawler
-     * @param url
-     * @param transform
-     */
     async scrape(url, transform) {
         try {
-            // Set a random referer
             const referer = referrers[Math.floor(Math.random() * referrers.length)];
-            // Launch the browser
             await this.launchBrowser();
             const page = await this.browser.newPage();
             await page.setCacheEnabled(false);
@@ -89,21 +73,20 @@ module.exports = class Crawler {
             await page.evaluateOnNewDocument(preloadFile);
             await page.goto(url, { waitUntil: "load", timeout: 0 });
 
-            // Log page content for debugging
             const content = await page.content();
             console.log(content);
 
             await page.addScriptTag({ path: require.resolve("jquery") });
-            const response = await page.evaluate(transform); // Execute transformation function
+            const response = await page.evaluate(transform);
 
-            // Log the extracted data
             console.log(response);
 
             await page.close();
-            return response; // Return scraped data
+            return response;
         } catch (error) {
             console.error("Error during scraping:", error);
             throw error;
         }
+   
     }
 };
