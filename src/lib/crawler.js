@@ -21,7 +21,7 @@ module.exports = class Crawler {
 		this.cache = new Cache(cacheConfig, cacheOptions);
 
 		// Browser launch check
-		this.isLaunched = false;
+		this.isLaunched = true;
 
 		// Results per page
 		this.perPage = options && options.perPage ? options.perPage : perPage;
@@ -79,7 +79,7 @@ module.exports = class Crawler {
 			// Launch the browser
 			await this.launchBrowser();
 			const page = await this.browser.newPage();
-			await page.setCacheEnabled(false);
+			await page.setCacheEnabled(true);
 			await page.setExtraHTTPHeaders({ referer });
 			await page._client.send("Network.clearBrowserCookies");
 			await page.evaluateOnNewDocument(preloadFile);
