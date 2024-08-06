@@ -1,12 +1,6 @@
-const Xvfb = require('xvfb');
-const xvfb = new Xvfb();
-
-xvfb.startSync();
-
-const puppeteer = require("puppeteer-extra");
 const Cache = require("./cache");
 const { readFileSync } = require("fs");
-const ZippyShare = require('./drivers/zippyshare');
+const puppeteer = require("puppeteer-extra");
 const referrers = require("../config/referrers.json");
 const { cache: cacheConfig, perPage } = require("../config");
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
@@ -19,89 +13,83 @@ puppeteer.use(AdblockerPlugin({ blockTrackers: true }));
 puppeteer.use(AnonymizeUA({ stripHeadless: true }));
 puppeteer.use(StealthPlugin());
 
-// Transformation function to extract data from the page
-const transform = () => {
-    // Replace 'selector' with your specific selector to match the elements you want to scrape
-    return Array.from(document.querySelectorAll('selector')).map(el => el.innerText);
-};
-const drivers = {
-    zippyshare: ZippyShare,
-    // Add other drivers here
-};
-
 module.exports = class Crawler {
-    constructor(options) {
-        let cacheOptions;
-        if (options) cacheOptions = options.cache;
-        this.cache = new Cache(cacheConfig, cacheOptions);
-        this.isLaunched = false;
-        this.perPage = options && options.perPage ? options.perPage : perPage;
-        this.drivers = drivers;
+	constructor(options) {
+		// Configure cache
+		let cacheOptions;
+		if (options) cacheOptions = options.cache;
+		this.cache = new Cache(cacheConfig, cacheOptions);
 
-         async scrape(driverName, url, transform) {
-        const Driver = this.drivers[driverName];
-        if (!Driver) {
-            throw new Error(`Driver not found: ${driverName}`);
-        }
-        const driverInstance = new Driver();
-        return await driverInstance.scrape(url, transform);
-    }
+		// Browser launch check
+		this.isLaunched = false;
 
-        return new Proxy(this, {
-            get: function (driver, property) {
-                if (property in driver) return driver[property];
-                return function () {
-                    throw new Error("No implementation found!");
-                };
-            },
-        });
-    }
+		// Results per page
+		this.perPage = options && options.perPage ? options.perPage : perPage;
 
-    async launchBrowser() {
-        if (!this.isLaunched) {
-            this.browser = await puppeteer.launch({
-                args: [
-                    "--no-sandbox",
-                    "--disable-setuid-sandbox",
-                    "--disable-dev-shm-usage",
-                    "--disable-gpu",
-                    "--single-process",
-                    "--no-zygote",
-                    "--window-size=1920,1080"
-                ],
-                headless: true,
-                ignoreHTTPSErrors: true,
-                slowMo: 0,
-            });
-            this.isLaunched = true;
-        }
-    }
+		// Throw error for methods not found
+		return new Proxy(this, {
+			get: function (driver, property) {
+				// If method exists
+				if (property in driver) return driver[property];
+				// Else
+				return function () {
+					throw new Error("No implementation found!");
+				};
+			},
+		});
+	}
 
-    async scrape(url, transform) {
-        try {
-            const referer = referrers[Math.floor(Math.random() * referrers.length)];
-            await this.launchBrowser();
-            const page = await this.browser.newPage();
-            await page.setCacheEnabled(false);
-            await page.setExtraHTTPHeaders({ referer });
-            await page._client.send("Network.clearBrowserCookies");
-            await page.evaluateOnNewDocument(preloadFile);
-            await page.goto(url, { waitUntil: "load", timeout: 0 });
+	/*
+	 * Initialize the browser
+	 * Ensure only a browser is running
+	 */
+	async launchBrowser() {
+		if (!this.isLaunched) {
+			this.browser = await puppeteer.launch({
+				args: [
+					"--disable-gpu",
+					"--no-sandbox",
+					"--disable-dev-shm-usage",
+					"--disable-setuid-sandbox",
+					"--disable-infobars",
+					"--window-position=0,0",
+					"--ignore-certifcate-errors",
+					"--ignore-certifcate-errors-spki-list",
+					"--disable-features=IsolateOrigins,site-per-process",
+					"--blink-settings=imagesEnabled=true",
+				],
+				headless: false,
+				ignoreHTTPSErrors: true,
+				slowMo: 0,
+			});
 
-            const content = await page.content();
-            console.log(content);
+			this.isLaunched = true;
+		}
+	}
 
-            await page.addScriptTag({ path: require.resolve("jquery") });
-            const response = await page.evaluate(transform);
-
-            console.log(response);
-
-            await page.close();
-            return response;
-        } catch (error) {
-            console.error("Error during scraping:", error);
-            throw error;
-        }
-   
-    }
+	/**
+	 * Web crawler
+	 * @param url
+	 * @param transform
+	 */
+	async scrape(url, transform) {
+		try {
+			// Set a random referer
+			const referer = referrers[Math.floor(Math.random() * referrers.length)];
+			// Launch the browser
+			await this.launchBrowser();
+			const page = await this.browser.newPage();
+			await page.setCacheEnabled(false);
+			await page.setExtraHTTPHeaders({ referer });
+			await page._client.send("Network.clearBrowserCookies");
+			await page.evaluateOnNewDocument(preloadFile);
+			await page.goto(url, { waitUntil: "load", timeout: 0 });
+			await page.addScriptTag({ path: require.resolve("jquery") });
+			const response = await page.evaluate(transform);
+			await page.close();
+			return response;
+		} catch (error) {
+			throw error;
+		}
+	}
 };
