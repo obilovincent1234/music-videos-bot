@@ -20,6 +20,8 @@ WORKDIR /home/src/raspar
 COPY ./ ./
 
 # Install app dependencies
+RUN npm install xvfb
+
 RUN npm install
 
 # Setup cache directory
