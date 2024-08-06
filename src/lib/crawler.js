@@ -13,6 +13,12 @@ puppeteer.use(AdblockerPlugin({ blockTrackers: true }));
 puppeteer.use(AnonymizeUA({ stripHeadless: true }));
 puppeteer.use(StealthPlugin());
 
+// Transformation function to extract data from the page
+const transform = () => {
+    // Replace 'selector' with your specific selector to match the elements you want to scrape
+    return Array.from(document.querySelectorAll('selector')).map(el => el.innerText);
+};
+
 module.exports = class Crawler {
     constructor(options) {
         // Configure cache
@@ -58,7 +64,7 @@ module.exports = class Crawler {
                     "--disable-features=IsolateOrigins,site-per-process",
                     "--blink-settings=imagesEnabled=true",
                 ],
-                headless: true, // Change to true for production use
+                headless: false, // Set to true for production use
                 ignoreHTTPSErrors: true,
                 slowMo: 0,
             });
@@ -69,32 +75,37 @@ module.exports = class Crawler {
 
     /**
      * Web crawler
-     * @param {string} url - The URL to scrape
-     * @param {Function} transform - Transformation function to apply on the page
-     * @returns {Promise<any>} - Scraped data
+     * @param url
+     * @param transform
      */
     async scrape(url, transform) {
         try {
             // Set a random referer
             const referer = referrers[Math.floor(Math.random() * referrers.length)];
-            
-            // Launch the browser if not already launched
+            // Launch the browser
             await this.launchBrowser();
-            
-            // Create a new page
             const page = await this.browser.newPage();
-            await page.setCacheEnabled(false); // Disable caching
-            await page.setExtraHTTPHeaders({ referer }); // Set random referrer header
-            await page._client.send("Network.clearBrowserCookies"); // Clear cookies
-            await page.evaluateOnNewDocument(preloadFile); // Inject preload script
-            await page.goto(url, { waitUntil: "load", timeout: 0 }); // Navigate to URL
-            await page.addScriptTag({ path: require.resolve("jquery") }); // Inject jQuery
+            await page.setCacheEnabled(false);
+            await page.setExtraHTTPHeaders({ referer });
+            await page._client.send("Network.clearBrowserCookies");
+            await page.evaluateOnNewDocument(preloadFile);
+            await page.goto(url, { waitUntil: "load", timeout: 0 });
+
+            // Log page content for debugging
+            const content = await page.content();
+            console.log(content);
+
+            await page.addScriptTag({ path: require.resolve("jquery") });
             const response = await page.evaluate(transform); // Execute transformation function
-            await page.close(); // Close the page
-            
+
+            // Log the extracted data
+            console.log(response);
+
+            await page.close();
             return response; // Return scraped data
         } catch (error) {
-            throw error; // Throw any encountered errors
+            console.error("Error during scraping:", error);
+            throw error;
         }
     }
 };
