@@ -49,14 +49,17 @@ module.exports = class Crawler {
      * Initialize the browser
      * Ensure only a browser is running
      */
-   async launchBrowser() {
+  async launchBrowser() {
     if (!this.isLaunched) {
         this.browser = await puppeteer.launch({
             args: [
                 "--no-sandbox",
-                "--disable-dev-shm-usage",
                 "--disable-setuid-sandbox",
-                // Other args as needed
+                "--disable-dev-shm-usage",
+                "--disable-gpu",
+                "--single-process",
+                "--no-zygote",
+                "--window-size=1920,1080" // Optional: Define window size
             ],
             headless: true, // Set to true for headless operation
             ignoreHTTPSErrors: true,
@@ -65,6 +68,7 @@ module.exports = class Crawler {
         this.isLaunched = true;
     }
 }
+
 
 
     /**
