@@ -58,7 +58,7 @@ module.exports = class Crawler {
 					"--disable-features=IsolateOrigins,site-per-process",
 					"--blink-settings=imagesEnabled=true",
 				],
-				headless: false,
+				headless: true,
 				ignoreHTTPSErrors: true,
 				slowMo: 0,
 			});
