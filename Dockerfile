@@ -1,33 +1,31 @@
 FROM node:lts-slim
 
-# Install latest chrome dev package and fonts to support major charsets (Chinese, Japanese, Arabic, Hebrew, Thai and a few others)
-# Note: this installs the necessary libs to make the bundled version of Chromium that Puppeteer installs, work.
+# Install dependencies
 RUN apt-get update \
-    && apt-get install -y wget gnupg \
+    && apt-get install -y wget gnupg ca-certificates \
     && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
-    && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
+    && echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list \
     && apt-get update \
     && apt-get install -y google-chrome-stable fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf libxss1 \
     --no-install-recommends \
-    && rm -rf /var/lib/apt/lists/* /etc/apt/sources.list.d/google.list
+    && rm -rf /var/lib/apt/lists/*
 
-# Install global dependencies
-RUN npm install -g pm2 nodemon
+# Set environment variables
+ENV CHROME_BIN=/usr/bin/google-chrome \
+    PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome
 
-# App setup
-WORKDIR /home/src/raspar
-
-COPY ./ ./
+# Create app directory
+WORKDIR /app
 
 # Install app dependencies
+COPY package.json ./
 RUN npm install
 
-# Setup cache directory
-RUN mkdir -p temp \
-    && chmod -R 777 temp/
+# Bundle app source
+COPY . .
 
-EXPOSE 3000
-
+# Run as non-privileged user
 USER node
 
-CMD [ "pm2-runtime", "npm", "--", "start" ]
+CMD ["npm", "start"]
