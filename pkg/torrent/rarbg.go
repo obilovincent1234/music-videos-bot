@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	rarbg "github.com/magunetto/go-torrentapi"
+	rarbg "github.com/qopher/go-torrentapi"
 )
 
 const (
