@@ -19,10 +19,4 @@ require (
 	golang.org/x/crypto v0.17.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/tucnak/telebot.v2 v2.0.0-20200120165535-b6c3367fed99
-	mellium.im/sasl v0.3.1 // indirect
-)
-
-require (
-	github.com/pkg/errors v0.8.1 // indirect
-	github.com/pmezard/go-difflib v1.0.0 // indirect
 )
