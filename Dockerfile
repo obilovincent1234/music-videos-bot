@@ -4,7 +4,7 @@ WORKDIR /go/src/github.com/obilovincent1234/music-videos-bot
 COPY . .
 
 # Run go mod tidy to ensure go.sum is up-to-date
-RUN cd music-videos-bot-main && go mod tidy
+RUN go mod tidy
 
 # Build the application
 RUN cd cmd/moviemagnetbot && go build
