@@ -10,10 +10,10 @@ import (
 
 	"gopkg.in/tucnak/telebot.v2"
 
-	"github.com/magunetto/moviemagnetbot/pkg/movie"
-	"github.com/magunetto/moviemagnetbot/pkg/torrent"
-	"github.com/magunetto/moviemagnetbot/pkg/uri"
-	"github.com/magunetto/moviemagnetbot/pkg/user"
+	"github.com/obilovincent1234/music-videos-bot/pkg/movie"
+	"github.com/obilovincent1234/music-videos-bot/pkg/torrent"
+	"github.com/obilovincent1234/music-videos-bot/pkg/uri"
+	"github.com/obilovincent1234/music-videos-bot/pkg/user"
 )
 
 const (
