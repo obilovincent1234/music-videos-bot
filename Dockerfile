@@ -4,7 +4,7 @@ WORKDIR /go/src/github.com/magunetto/moviemagnetbot
 COPY . .
 
 # Run go mod tidy to ensure go.sum is up-to-date
-RUN cd cmd/moviemagnetbot && go mod tidy
+RUN cd moviemagnetbot-master && go mod tidy
 
 # Build the application
 RUN cd cmd/moviemagnetbot && go build
