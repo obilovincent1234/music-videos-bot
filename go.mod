@@ -22,7 +22,7 @@ require (
 	mellium.im/sasl v0.3.1 // indirect
 
 	// New dependency for 1337x API
-	github.com/thanosdelas/1337x-API v1.0.0
+	github.com/hemantapkh/1337x
 )
 
 require (
