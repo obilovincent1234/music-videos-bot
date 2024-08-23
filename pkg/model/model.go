@@ -3,8 +3,8 @@ package model
 import (
 	"github.com/go-pg/pg"
 
-	"github.com/magunetto/moviemagnetbot/pkg/torrent"
-	"github.com/magunetto/moviemagnetbot/pkg/user"
+	"github.com/obilovincent1234/music-videos-bot/pkg/torrent"
+	"github.com/obilovincent1234/music-videos-bot/pkg/user"
 )
 
 // CreateSchema create tables for models
