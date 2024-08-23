@@ -3,12 +3,12 @@ package main
 import (
 	"log"
 
-	"github.com/magunetto/moviemagnetbot/pkg/bot"
-	"github.com/magunetto/moviemagnetbot/pkg/db"
-	"github.com/magunetto/moviemagnetbot/pkg/http"
-	"github.com/magunetto/moviemagnetbot/pkg/model"
-	"github.com/magunetto/moviemagnetbot/pkg/movie"
-	"github.com/magunetto/moviemagnetbot/pkg/torrent"
+	"github.com/obilovincent1234/music-videos-bot/pkg/bot"
+	"github.com/obilovincent1234/music-videos-bot/pkg/db"
+	"github.com/obilovincent1234/music-videos-bot/pkg/http"
+	"github.com/obilovincent1234/music-videos-bot/pkg/model"
+	"github.com/obilovincent1234/music-videos-bot/pkg/movie"
+	"github.com/obilovincent1234/music-videos-bot/pkg/torrent"
 )
 
 func main() {
