@@ -9,8 +9,8 @@ import (
 	"github.com/gorilla/feeds"
 	"github.com/speps/go-hashids"
 
-	"github.com/magunetto/moviemagnetbot/pkg/db"
-	"github.com/magunetto/moviemagnetbot/pkg/torrent"
+	"github.com/obilovincent1234/music-videos-bot/pkg/db"
+	"github.com/obilovincent1234/music-videos-bot/pkg/torrent"
 )
 
 const (
