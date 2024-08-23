@@ -6,7 +6,7 @@ import (
 
 	rarbg "github.com/qopher/go-torrentapi"
 
-	"github.com/magunetto/moviemagnetbot/pkg/db"
+	"github.com/obilovincent1234/music-videos-bot/pkg/db"
 )
 
 // Torrent (magnet links)
