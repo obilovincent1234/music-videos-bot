@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"time"
 
-	rarbg "github.com/qopher/go-torrentapi"
-
 	"github.com/obilovincent1234/music-videos-bot/pkg/db"
 )
 
@@ -16,12 +14,19 @@ type Torrent struct {
 	Magnet              string
 	PubStamp            int64
 	DownloadedAt        time.Time `sql:"-"`
-	rarbg.TorrentResult `sql:"-"`
+	TorrentResult       `sql:"-"`
+}
+
+type TorrentResult struct {
+	Title     string `json:"title"`
+	Magnet    string `json:"magnet"`
+	PubDate   string `json:"pub_date"` // Ensure this field matches your API response
+	// Add other fields as needed
 }
 
 func (t *Torrent) create() (*Torrent, error) {
 	_, err := db.DB.Model(t).
-		Where("pub_stamp= ?pub_stamp").
+		Where("pub_stamp = ?pub_stamp").
 		OnConflict("DO NOTHING").
 		SelectOrInsert()
 	return t, err
