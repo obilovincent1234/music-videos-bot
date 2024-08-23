@@ -7,7 +7,7 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"github.com/magunetto/moviemagnetbot/pkg/user"
+	"github.com/obilovincent1234/music-videos-bot/pkg/user"
 )
 
 // RunServer register handlers and start HTTP server
