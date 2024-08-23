@@ -20,6 +20,9 @@ require (
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/tucnak/telebot.v2 v2.0.0-20200120165535-b6c3367fed99
 	mellium.im/sasl v0.3.1 // indirect
+
+	// New dependency for 1337x API
+	github.com/thanosdelas/1337x-API v1.0.0
 )
 
 require (
