@@ -1,7 +1,7 @@
 package torrent
 
 import (
-	"github.com/magunetto/moviemagnetbot/pkg/uri"
+	"github.com/obilovincent1234/music-videos-bot/pkg/uri"
 )
 
 // SaveTorrentFromLink creates a Torrent from a link
