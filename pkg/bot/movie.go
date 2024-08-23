@@ -9,7 +9,7 @@ import (
 
 	telebot "gopkg.in/tucnak/telebot.v2"
 
-	"github.com/magunetto/moviemagnetbot/pkg/movie"
+	"github.com/obilovincent1234/music-videos-bot/pkg/movie"
 )
 
 func movieSearchHandler(b *telebot.Bot, m *telebot.Message) {
