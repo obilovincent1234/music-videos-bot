@@ -1,4 +1,4 @@
-module github.com/magunetto/moviemagnetbot
+module github.com/obilovincent1234/music-videos-bot
 
 go 1.19
 
