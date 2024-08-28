@@ -7,7 +7,7 @@ const cronService = require('./services/cron');
 require('dotenv').config();
 
 // Retrieve MongoDB URI from environment variables
-const mongoURI = process.env.MONGO_URI;
+const mongoURI = "MONGO_URI=mongodb+srv://your_username:your_password@cluster0.cen1xf9.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
