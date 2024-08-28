@@ -8,8 +8,10 @@ const Search = require('./../models/Search');
 const Movie = require('./../models/Movie');
 const Log = require('./../models/Log');
 
+const mongoURI = "MONGO_URI=mongodb+srv://your_username:your_password@cluster0.cen1xf9.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+
 // Database connection
-mongoose.connect(process.env.MONGO_URI, {
+mongoose.connect(mongoURI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     authSource: 'admin'
