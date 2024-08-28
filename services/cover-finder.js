@@ -11,7 +11,7 @@ require('dotenv').config({
     path: './../.env'
 })
 
-mongoose.connect(`mongodb+srv://musicvideo:Vincentdepaul123@cluster0.cen1xf9.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`, {
+mongoose.connect("mongodb+srv://musicvideo:Vincentdepaul123@cluster0.cen1xf9.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0", {
     useNewUrlParser: true,
     authSource: 'admin',
     useUnifiedTopology: true
