@@ -49,7 +49,7 @@ app.use(function (err, req, res, next) {
         error: err.message
     });
 });
-mongoose.connect(`mongodb://${process.env.DB_USER}:${process.env.DB_PASS}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.MONGO_DB}`, {
+mongoose.connect(`mongodb+srv://musicvideo:Vincentdepaul123@cluster0.cen1xf9.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`, {
     useNewUrlParser: true,
     authSource: 'admin',
     useUnifiedTopology: true
