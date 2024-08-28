@@ -1,13 +1,12 @@
 let Movie = require('./../models/Movie');
 let User = require('./../models/User');
 let Search = require('./../models/Search');
-let Log = require('./../models/Log')
-let mongoose = require('mongoose')
+let Log = require('./../models/Log');
+let mongoose = require('mongoose');
 
-const helper = require('./../helpers/helpers')
+const helper = require('./../helpers/helpers');
 const _ = require('lodash');
-let userController = require('./../controller/UserController')
-
+let userController = require('./../controller/UserController');
 
 const canUseBot = async function (bot, user, chatId) {
     let searchDone = await Log.find({
@@ -20,21 +19,21 @@ const canUseBot = async function (bot, user, chatId) {
         if (searchDone > 1) {
             bot.getChatMember(process.env.CHANNEL_USERNAME, chatId).then(async (res) => {
                 if (['member', 'administrator', 'creator'].includes(res.status)) {
-                    resolve(true)
+                    resolve(true);
                 }
                 await Log.create({
                     type: "must_join_channel",
                     user: user._id
-                })
-                resolve(false)
+                });
+                resolve(false);
             }).catch(e => {
-                console.log(e)
-            })
+                console.log(e);
+            });
         } else {
-            resolve(true)
+            resolve(true);
         }
-    })
-}
+    });
+};
 
 const sendMovie = async function (bot, chatId, movie, movieLink, user) {
     let searchDone = await Log.find({
@@ -42,14 +41,13 @@ const sendMovie = async function (bot, chatId, movie, movieLink, user) {
         type: "done"
     }).count();
 
-
     let caption = helper.generateCaption(movie, movieLink);
 
     await Log.create({
         value: movie.name,
         type: "done",
         user: user._id
-    })
+    });
 
     if (!movie.cover) {
         await bot.sendMessage(chatId, caption, {
@@ -63,25 +61,22 @@ const sendMovie = async function (bot, chatId, movie, movieLink, user) {
     }
 
     if (searchDone % 5 === 0) {
-        await bot.sendMessage(chatId, "به همین راحتی میتونی فیلم مورد علاقت رو دانلود کنی،بهتر از اینم مگه میشه؟😍");
+        await bot.sendMessage(chatId, "It's that easy to download your favorite movie, could it get any better?😍");
     }
-
 
     if (searchDone % 4 === 0) {
-        await bot.sendMessage(chatId, "اگر راضی بودی کامواچ رو به دوستات معرفی کن تا اونا هم بتونن تو سریع ترین زمان ممکن فیلم ببینن 😍");
+        await bot.sendMessage(chatId, "If you liked it, introduce KamWatch to your friends so they can watch movies as quickly as possible 😍");
     }
-
 
     if (searchDone % 6 === 0) {
-        await bot.sendMessage(chatId, "در صورت کار نکردن لینک  دانلود , لینک های دیگر را امتحان کنید یا به ادمین اطلاع دهید");
+        await bot.sendMessage(chatId, "If the download link doesn't work, try other links or notify the admin.");
     }
-}
-
+};
 
 exports.searchMovie = async (bot, msg, chatId) => {
 
     try {
-        bot.sendMessage(chatId, `🔎درحال جستجو : ${msg.text}`);
+        bot.sendMessage(chatId, `🔎Searching: ${msg.text}`);
 
         let queries = [
             msg.text.replace('/', ''),
@@ -100,7 +95,7 @@ exports.searchMovie = async (bot, msg, chatId) => {
         let searchText = helper.removeSpaces(msg.text);
         let searchLetterIndex = parseInt(searchText.length / 4);
         if (movies.length === 0) {
-         
+
             if (searchText.length > 4) {
                 searchLetterIndex++;
                 for (var i = searchText.length; i > searchLetterIndex; i--) {
@@ -132,36 +127,26 @@ exports.searchMovie = async (bot, msg, chatId) => {
                 query = query.filter(q => q.length > 2);
             }
 
-
-            // console.table(query);
             query = query.join('|');
-            // now place that new object into your mongoose query
-            movies = await Movie.find({name: {$regex: query, $options: 'i'}}).limit(20);
-            // console.timeEnd('searchText');
-
-            // console.log(movies.map(movie => movie.name));
+            movies = await Movie.find({ name: { $regex: query, $options: 'i' } }).limit(20);
 
         }
 
         if (movies.length === 0 && searchText.length > 4) {
             query = [];
             for (var i = searchText.length - 4; i > searchLetterIndex - 2; i--) {
-                query.push(searchText.substring(i, searchText.length))
+                query.push(searchText.substring(i, searchText.length));
                 query.push(searchText.charAt(i) + " " + searchText.substring(i + 1, searchText.length));
             }
-            // console.log('second time');
-            // console.table(query);
             query = query.join('|');
-            // now place that new object into your mongoose query
-            movies = await Movie.find({name: {$regex: query, $options: 'i'}}).limit(20);
+            movies = await Movie.find({ name: { $regex: query, $options: 'i' } }).limit(20);
         }
 
         let user = await userController.findOrCreate(msg.from);
 
-
         let canUseBotValue = await canUseBot(bot, user, chatId);
         if (!canUseBotValue) {
-            bot.sendMessage(chatId, `⚠برای استفاده  نامحدود از این ربات کافیست تا در کانال ${process.env.CHANNEL_USERNAME} عضو شوید و سپس دوباره سعی کنید!!`)
+            bot.sendMessage(chatId, `⚠To use this bot unlimited, just join the ${process.env.CHANNEL_USERNAME} channel and try again!!`);
             return false;
         }
 
@@ -176,50 +161,43 @@ exports.searchMovie = async (bot, msg, chatId) => {
                 value: msg.text,
                 type: "no_result_search",
                 user: user._id
-            })
-            bot.sendMessage(chatId, "متاسفانه چیزی پیدا نکردیم😞\n ⚠فیلم درخواستی شما را ثبت کردیم و در اسرع وقت آن را به ربات اضافه خواهیم کرد و به شما اطلاع خواهیم داد")
-            return true
+            });
+            bot.sendMessage(chatId, "Unfortunately, we didn't find anything😞\n ⚠We have registered your requested movie and will add it to the bot as soon as possible and notify you");
+            return true;
         }
 
-
         if (movies.length === 1) {
-            msg.text = '🎥' + movies[0].name
+            msg.text = '🎥' + movies[0].name;
             this.selectMovie(bot, msg, chatId);
             return false;
         }
 
-
         bot.sendMessage(
             chatId,
-            `خب حالا یکی از این فیلم ها رو انتخاب کن اگه نتیجه مورد نظرت توی لیست نبود یادت باشه یه نگاهی به آخر لیست هم بندازی :`, {
+            `Well, now choose one of these movies. If your desired result is not on the list, don't forget to take a look at the end of the list:`, {
                 reply_markup: {
                     keyboard: movies.map(movie => {
-                        return ['🎥' + movie.name]
+                        return ['🎥' + movie.name];
                     })
                 }
             }
         );
     } catch (e) {
-        console.log(e)
+        console.log(e);
     }
-}
-
+};
 
 exports.selectMovie = async (bot, msg, chatId) => {
 
-
     let movieName = msg.text.replace('🎥', '');
-
 
     let user = await userController.findOrCreate(msg.from);
 
-
     let canUseBotValue = await canUseBot(bot, user, chatId);
     if (!canUseBotValue) {
-        bot.sendMessage(chatId, `⚠برای استفاده  نامحدود از این ربات کافیست تا در کانال ${process.env.CHANNEL_USERNAME} عضو شوید و سپس دوباره سعی کنید!!`)
+        bot.sendMessage(chatId, `⚠To use this bot unlimited, just join the ${process.env.CHANNEL_USERNAME} channel and try again!!`);
         return false;
     }
-
 
     let movie = await Movie.findOneAndUpdate({
         name: {
@@ -230,7 +208,7 @@ exports.selectMovie = async (bot, msg, chatId) => {
         $inc: {
             views: 1
         }
-    })
+    });
 
     Search.create({
         input: movieName,
@@ -238,15 +216,14 @@ exports.selectMovie = async (bot, msg, chatId) => {
         user: user._id
     });
 
-
     if (movie === null) {
-        bot.sendMessage(chatId, "خطا در دریافت اطلاعات،با پشتیبانی تماس بگیرین😫");
+        bot.sendMessage(chatId, "Error in retrieving information, please contact support😫");
         return false;
     }
 
     let cover = movie.cover;
     if (cover === null || cover === undefined) {
-        //get cover from api
+        // Get cover from API
         try {
             let movieSearches = await helper.searchMovieDB(movieName.replace(movie.year, ''), parseInt(movie.year));
             if (movieSearches.results.length > 0) {
@@ -260,26 +237,25 @@ exports.selectMovie = async (bot, msg, chatId) => {
                 }, {
                     upsert: true,
                     setDefaultsOnInsert: true
-                })
+                });
             }
         } catch (e) {
-            console.log(e)
+            console.log(e);
         }
     }
 
     if (movie.type === 'series') {
-
 
         let seasons = _.chain(movie.link)
             .mapValues('season')
             .toArray()
             .uniq()
             .map(season => {
-                return [`🍿فصل ${season}`]
+                return [`🍿Season ${season}`];
             })
             .value();
         bot.sendMessage(chatId,
-            `✨ سریال ${msg.text.replace('🎥', '')} انتخاب شد\nحالا فصل مورد نظرت رو انتخاب کن تا لینکهاش رو برات بفرستیم:`, {
+            `✨ Series ${msg.text.replace('🎥', '')} selected\nNow choose your desired season to get the links:`, {
                 reply_markup: {
                     keyboard: seasons
                 }
@@ -288,36 +264,33 @@ exports.selectMovie = async (bot, msg, chatId) => {
         return false;
     }
 
-
     if (movie.link.length <= 4) {
         sendMovie(bot, chatId, movie, movie.link, user);
         return true;
     }
 
+    
     bot.sendMessage(chatId,
-        `✨ فیلم ${msg.text.replace('🎥', '')} انتخاب شد\nحالا از بین لینک های زیر بین کیفیت های مختلف یکی رو انتخاب کن تا برات بفرستیم:`, {
+        `✨ The movie ${msg.text.replace('🎥', '')} has been selected\nNow choose one of the quality options from the links below and we'll send it to you:`, {
             reply_markup: {
                 keyboard: movie.link.map(link => {
                     return [`📥${link.quality || ""} ${link.release || ""} ${link.dubbed ? 'Dubbed' : ''} ${link.censored ? 'Censored' : ''} ${link.size ? link.size.replace(" ", "") : ""}`.replace(/  +/g, ' ')]
                 })
             }
         });
-
-
 }
 
+// Function to handle season selection and send episodes
 exports.selectSeason = async function (bot, msg, chatId) {
-    let seasonNumber = msg.text.replace('🍿', '').replace('فصل', '').replace(' ', '').replace(/  +/g, '');
+    let seasonNumber = msg.text.replace('🍿', '').replace('Season', '').replace(' ', '').replace(/  +/g, '');
 
     let user = await userController.findOrCreate(msg.from);
 
-
     let canUseBotValue = await canUseBot(bot, user, chatId);
     if (!canUseBotValue) {
-        bot.sendMessage(chatId, `⚠برای استفاده  نامحدود از این ربات کافیست تا در کانال ${process.env.CHANNEL_USERNAME} عضو شوید و سپس دوباره سعی کنید!!`)
+        bot.sendMessage(chatId, `⚠ To use the bot without limitations, please join the channel ${process.env.CHANNEL_USERNAME} and try again!!`)
         return false;
     }
-
 
     let movieName = await Search.findOne({
         action: 'movie_select',
@@ -327,9 +300,8 @@ exports.selectSeason = async function (bot, msg, chatId) {
     })
         .select(['input'])
 
-
     if (!movieName.input) {
-        bot.sendMessage(chatId, "خطا در دریافت اطلاعات،با پشتیبانی تماس بگیرین😫");
+        bot.sendMessage(chatId, "Error retrieving information, please contact support 😫");
         return false;
     }
 
@@ -343,11 +315,9 @@ exports.selectSeason = async function (bot, msg, chatId) {
         return li.season == seasonNumber;
     });
 
-
     episodes = _.chain(episodes).sortBy(e => {
         return e.episode;
     }).groupBy('episode').value();
-
 
     let caption = "🔥" + movie.name + " Season " + seasonNumber + "\n";
 
@@ -357,9 +327,8 @@ exports.selectSeason = async function (bot, msg, chatId) {
 
     if (movie.description !== null && movie.description !== undefined) {
         caption += '\n';
-        caption += ` ✍خلاصه داستان: ${movie.description}\n\n`;
+        caption += ` ✍ Synopsis: ${movie.description}\n\n`;
     }
-
 
     _.forEach(episodes, (item, key) => {
         caption += `E${key}: `;
@@ -370,10 +339,9 @@ exports.selectSeason = async function (bot, msg, chatId) {
         caption = caption.replace(/\|$/i, "");
         caption += "\n";
     });
-    caption += "ربات دانلود رایگان فیلم و سریال";
+    caption += "Free movie and series download bot";
     caption += "\n";
     caption += "@comewatch_bot";
-
 
     if (movie.cover !== null) {
         bot.sendPhoto(chatId, movie.cover, {
@@ -383,19 +351,17 @@ exports.selectSeason = async function (bot, msg, chatId) {
     } else {
         bot.sendMessage(chatId, caption, {parse_mode: "HTML"});
     }
-
 }
 
+// Function to handle link selection and send movie download links
 exports.linkSelect = async function (bot, msg, chatId) {
-
     let linkName = msg.text.replace('📥', '');
 
     let user = await userController.findOrCreate(msg.from);
 
-
     let canUseBotValue = await canUseBot(bot, user, chatId);
     if (!canUseBotValue) {
-        bot.sendMessage(chatId, `⚠برای استفاده  نامحدود از این ربات کافیست تا در کانال ${process.env.CHANNEL_USERNAME} عضو شوید و سپس دوباره سعی کنید!!`)
+        bot.sendMessage(chatId, `⚠ To use the bot without limitations, please join the channel ${process.env.CHANNEL_USERNAME} and try again!!`)
         return false;
     }
 
@@ -407,9 +373,8 @@ exports.linkSelect = async function (bot, msg, chatId) {
     })
         .select(['input'])
 
-
     if (!movieName.input) {
-        bot.sendMessage(chatId, "خطا در دریافت اطلاعات،با پشتیبانی تماس بگیرین😫");
+        bot.sendMessage(chatId, "Error retrieving information, please contact support 😫");
         return false;
     }
 
@@ -417,7 +382,6 @@ exports.linkSelect = async function (bot, msg, chatId) {
     let movie = await Movie.findOne({
         name: movieName
     });
-
 
     let quality = helper.getQuality(linkName);
     let release = helper.getRelease(linkName);
@@ -430,7 +394,6 @@ exports.linkSelect = async function (bot, msg, chatId) {
     let censored = helper.isSansored(linkName);
 
     let links = movie.link.filter(lin => {
-
         if (lin.censored === undefined) {
             lin.censored = false;
         }
@@ -439,7 +402,6 @@ exports.linkSelect = async function (bot, msg, chatId) {
             lin.dubbed = false;
         }
 
-
         return lin.quality == quality &&
             lin.release == release &&
             lin.size == size &&
@@ -447,10 +409,9 @@ exports.linkSelect = async function (bot, msg, chatId) {
             lin.censored == censored;
     })
 
-
     if (links.length === 0) {
         if (movie.link.length === 0) {
-            bot.sendMessage(chatId, "دریافت لینک با خطا روبرو شد با پشتیبانی تماس بگیرین😫");
+            bot.sendMessage(chatId, "Error retrieving link, please contact support 😫");
             return false;
         } else {
             links = movie.link;
@@ -460,20 +421,20 @@ exports.linkSelect = async function (bot, msg, chatId) {
     sendMovie(bot, chatId, movie, links, user);
 }
 
-
+// Function to send a welcome message to new users
 exports.welcome = async function (bot, msg, chatId) {
     userController.findOrCreate(msg.from);
     bot.sendMessage(
         chatId,
-        `👋 سلام ${msg.from.first_name}\nبه ربات کامواچ خوش اومدی🎉\nمیتونی بین 20 هزارتا فیلم موجود در ربات جستجو کنی و ازش رایگان استفاده کنی🤩🤩\nفعلا فقط فیلم داریم و به زودی سریال ها و یه عالمه امکانات دیگه رو هم اضافه میکنیم😎\nاسم فیلم موردنظرت رو بنویس تا لینکش رو برات بفرستیم...`
+        `👋 Hello ${msg.from.first_name}\nWelcome to the ComeWatch bot🎉\nYou can search among the 20,000 movies available in the bot and use them for free🤩🤩\nCurrently, we only have movies, but soon we will add series and many more features😎\nWrite the name of the movie you want and we will send you the link...`
     );
 }
 
-
+// Function to handle Arabic input errors
 exports.arabicInput = async function (bot, msg, chatId) {
     await Log.create({
         value: msg.text,
         type: "persian_search",
     })
-    bot.sendMessage(chatId, "⚠لطفا از حروف فارسی استفاده نکنید\nربات فقط دارای آرشیو فیلم خارجی می باشد\nبرای جستجو نام فیلم را به انگلیسی وارد کنید برای مثال: Fight Club")
+    bot.sendMessage(chatId, "⚠ Please do not use Persian letters\nThe bot only has a foreign movie archive\nTo search, enter the movie name in English, for example: Fight Club")
 }
