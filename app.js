@@ -5,6 +5,7 @@ var cors = require('cors')
 //.env config
 require('dotenv').config()
 
+const mongoURI = `mongodb+srv://musicvideo:Vincentdepaul123@cluster0.cen1xf9.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
@@ -49,7 +50,7 @@ app.use(function (err, req, res, next) {
         error: err.message
     });
 });
-mongoose.connect("mongodb+srv://musicvideo:Vincentdepaul123@cluster0.cen1xf9.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0", {
+mongoose.connect(mongoURI, {
     useNewUrlParser: true,
     authSource: 'admin',
     useUnifiedTopology: true
